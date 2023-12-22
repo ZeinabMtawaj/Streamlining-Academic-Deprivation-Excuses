@@ -47,8 +47,14 @@ class FileController extends Controller
 
         if ($folder == "excuses"){
             $path = $fileRecord->excuse_file_path;
-        }else{
+        }else if ($folder == "rejection reason files"){
             $path = $fileRecord->rejection_reason_file_path;
+        } else if ($folder == "academic file"){
+            $path = $fileRecord->academic_file;
+
+        } else if ($folder == "absence"){
+        
+            $path = $fileRecord->absence;
         }
 
         if (strpos($path, "{$folder}/") !== 0) {

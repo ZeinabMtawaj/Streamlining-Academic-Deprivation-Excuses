@@ -139,6 +139,11 @@ return [
     'import' => 'تحميل',
     'import_data' => 'البيانات المحمّلة',
     'excuse' => 'عذر',
+    'academic-file' => 'الملف الأكاديمي',
+    'absence'  => 'ملف الغياب',
+    'academic_file' => 'الملف الأكاديمي',
+    'rejection_reason' => 'سبب الرفض',
+
 
 
 

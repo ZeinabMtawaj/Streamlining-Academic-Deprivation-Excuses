@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container mt-3 pt-5">
+<div class="container-fluid mt-3 pt-5">
     <div class="row">
         {{-- <div class="col-md-2">
             <img src="{{ asset('images/document.jpg') }}" class="img-fluid" alt="Descriptive Alt Text">
@@ -24,7 +24,7 @@
             </div> --}}
             {{-- <h3 class="modern-title">@lang('messages.excuses')</h3> --}}
             <div class="card  shadow">
-                <div class="card-body">
+                <div class="card-body table-responsive">
                     <table class="table" id="dataTable1">
                         <thead class="thead-light">
                             <tr>
@@ -34,6 +34,8 @@
                                     <th scope="col">@lang('messages.course')</th> 
                                     <th scope="col">@lang('messages.initial_absence_percentage')</th>
                                     <th scope="col">@lang('messages.excuse')</th> 
+                                    <th scope="col">@lang('messages.academic-file')</th> 
+                                    <th scope="col">@lang('messages.absence')</th> 
                                     <th scope="col">@lang('messages.advisor_decision')</th> 
 
                                     @if($stat == "Approved")
@@ -72,8 +74,21 @@
                                             @php $url = route('file.download', ['model' => 'excuse', 'folder' => 'excuses', 'id' => $excuse->id, 'file' => $name_of_file]); @endphp
                                             <a href="{{ $url }}">{{ $name_of_file }}</a>
                                         </td>
+
                                         <td>
-                                            @php
+                                            @php $name_of_file = basename($excuse->academic_file); @endphp
+                                            @php $url = route('file.download', ['model' => 'excuse', 'folder' => 'academic file', 'id' => $excuse->id, 'file' => $name_of_file]); @endphp
+                                            <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                        </td>
+                                        <td>
+                                            @php $name_of_file = basename($excuse->absence); @endphp
+                                            @php $url = route('file.download', ['model' => 'excuse', 'folder' => 'absence', 'id' => $excuse->id, 'file' => $name_of_file]); @endphp
+                                            <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                        </td>
+                                        
+                                        <td>
+                                            <div class="scrollable-td">
+                                                @php
                                                 $badgeClass = match($excuse->advisor_decision) {
                                                     'Pending' => 'badge-pending',
                                                     'Approved' => 'badge-approved',
@@ -92,7 +107,10 @@
                                                 @endphp
                                                 <br>
                                                 <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                                <br>
+                                                <p> {{$excuse->rejection_reason}}</p>
                                             @endif
+                                            </div>
                                         </td>
                                         @if($stat == "Approved")
 
@@ -103,6 +121,8 @@
 
                                      
                                         <td>
+                                            <div class="scrollable-td">
+
                                             @php
                                             $badgeClass = match($excuse->committee_decision) {
                                                 'Pending' => 'badge-pending',
@@ -115,6 +135,7 @@
                                                 @lang('messages.' . $excuse->committee_decision)
                                             </span>
 
+
                                             @if ($excuse->committee_decision == 'Rejected' && $excuse->rejection_reason_file_path)
                                             @php 
                                                 $name_of_file = basename($excuse->rejection_reason_file_path); 
@@ -122,11 +143,16 @@
                                             @endphp
                                             <br>
                                             <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                            <br>
+                                            <p> {{$excuse->rejection_reason}}</p>
+                                            <div class="scrollable-td">
                                             @endif
                                         </td>
 
                                         <td>{{ ($excuse->deprivation->current_absence_percentage)."%" ?? __('messages.no_current_absence_percentage') }}</td>
                                         <td>
+                                            {{-- <div class="scrollable-td"> --}}
+
                                             @php
                                             $badgeClass = match($excuse->deprivation->status) {
                                                 'Pending' => 'badge-pending',
@@ -138,6 +164,10 @@
                                             <span class="badge {{ $badgeClass }}">
                                                 @lang('messages.' . $excuse->deprivation->status)
                                             </span>
+                                            {{-- <p> {{$excuse->rejection_reason}}</p>
+                                            <div class="scrollable-td"> --}}
+
+
                                         </td>
 
                                         @endif
@@ -190,6 +220,8 @@
                 <label for="rejectionFile" class="custom-file-upload swal2-styled">
                     Choose File
                 </label>
+                <textarea id="explain" name="rejection_reason" rows="4" cols="50" placeholder="Explain ...."></textarea>
+
             `;
             confirmButtonText = @json(__('messages.submit_rejection'));
         }
@@ -219,6 +251,8 @@
 
                 if (!status) {
                     formData.append('file', document.getElementById('rejectionFile').files[0]);
+                    formData.append('rejection_reason', document.getElementById('explain').value);
+
 
                 }else{
                     formData.append('current_absence_percentage', document.getElementById('current_absence_percentage').value);

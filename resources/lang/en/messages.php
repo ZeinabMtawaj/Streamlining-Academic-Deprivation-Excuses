@@ -145,7 +145,14 @@ return [
     'export' => 'Export',
     'approved_excuses' => 'Approved Excuses',
     'rejected_excuses' => 'Rejected Excuses',
-    'status_deprivation' => 'Status of Deprivation',
+    'status_deprivation' => 'Status of Excuse',
+    'academic-file' => 'Academic File',
+    'absence'  => 'Absence',
+    'academic_file' => 'Academic File',
+    'academic_file' => 'Academic File',
+    'rejection_reason' => 'Rejection Reason',
+
+
 
 
  

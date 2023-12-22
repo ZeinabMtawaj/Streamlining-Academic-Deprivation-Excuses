@@ -148,6 +148,11 @@ return [
     'import' => 'Import',
     'import_data' => 'Import Data',
     'excuse' => 'Excuse',
+    'academic-file' => 'Academic File',
+    'absence'  => 'Absence',
+    'academic_file' => 'Academic File',
+    'rejection_reason' => 'Rejection Reason',
+
 
 
 

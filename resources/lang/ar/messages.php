@@ -144,7 +144,12 @@ return [
     'export' => 'تنزيل',
     'approved_excuses' => 'الأعذار المقبولة',
     'rejected_excuses' => 'الأعذار المرفوضة',
-    'status_deprivation' => 'حالة الحرمان',
+    'status_deprivation' => 'حالة العذر',
+    'academic-file' => 'الملف الأكاديمي',
+    'absence'  => 'ملف الغياب',
+    'academic_file' => 'الملف الأكاديمي',
+    'rejection_reason' => 'سبب الرفض',
+
 
 
 

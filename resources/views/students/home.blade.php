@@ -23,6 +23,8 @@
                                     <th scope="col">@lang('messages.initial_absence_percentage')</th>
                                     <th scope="col">@lang('messages.current_absence_percentage')</th> 
                                     <th scope="col">@lang('messages.excuse')</th> 
+                                    <th scope="col">@lang('messages.academic-file')</th> 
+                                    <th scope="col">@lang('messages.absence')</th> 
                                     <th scope="col">@lang('messages.status')</th> 
 
 
@@ -43,12 +45,44 @@
                                     
                                     
                                         @if($deprivation->excuse)
+                                        @if ($deprivation->excuse->excuse_file_path)
                                         <td>
                                             @php $name_of_file = basename($deprivation->excuse->excuse_file_path); @endphp
                                             @php $url = route('file.download', ['model' => 'excuse', 'folder' => 'excuses', 'id' => $deprivation->excuse->id, 'file' => $name_of_file]); @endphp
                                             <a href="{{ $url }}">{{ $name_of_file }}</a>
                                         </td>
+                                        @else
                                         <td>
+                                            <i class="fa fa-file-upload  custom-icon custom-color-icon" onclick="enterFile({{ $deprivation->id }}, 'excuses')" title="{{ __('messages.enter_excuse') }}"></i>
+                                        </td>
+                                        @endif
+                                        @if ($deprivation->excuse->academic_file)
+                                        <td>
+                                            @php $name_of_file = basename($deprivation->excuse->academic_file); @endphp
+                                            @php $url = route('file.download', ['model' => 'excuse', 'folder' => 'academic file', 'id' => $deprivation->excuse->id, 'file' => $name_of_file]); @endphp
+                                            <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                        </td>
+                                        @else
+                                        <td>
+                                            <i class="fa fa-file-upload  custom-icon custom-color-icon" onclick="enterFile({{ $deprivation->id }}, 'academic file')" title="{{ __('messages.academic_file') }}"></i>
+
+                                        </td>
+                                        @endif
+                                        @if ($deprivation->excuse->absence)
+                                        <td>
+                                            @php $name_of_file = basename($deprivation->excuse->absence); @endphp
+                                            @php $url = route('file.download', ['model' => 'excuse', 'folder' => 'absence', 'id' =>$deprivation->excuse->id, 'file' => $name_of_file]); @endphp
+                                            <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                        </td>
+                                        @else
+                                        <td>
+                                            <i class="fa fa-file-upload  custom-icon custom-color-icon" onclick="enterFile({{ $deprivation->id }}, 'absence')" title="{{ __('messages.absence') }}"></i>
+
+                                        </td> 
+                                        @endif
+                                        <td>
+                                            <div class="scrollable-td">
+
                                             @php
                                                 $badgeClass = match($deprivation->status) {
                                                     'Pending' => 'badge-pending',
@@ -60,22 +94,40 @@
                                             <span class="badge {{ $badgeClass }}">
                                                 @lang('messages.' . $deprivation->status)
                                             </span>
-                                            @if ($deprivation->excuse->advisor_decision == 'Rejected' && $deprivation->excuse->rejection_reason_file_path)
+                                            @if ( $deprivation->excuse->rejection_reason_file_path)
                                             @php 
                                                 $name_of_file = basename($deprivation->excuse->rejection_reason_file_path); 
                                                 $url = route('file.download', ['model' => 'excuse', 'folder' => 'rejection reason files', 'id' => $deprivation->excuse->id, 'file' => $name_of_file]);
                                             @endphp
                                             <br>
                                             <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                            <br>
+                                            <p> {{$deprivation->excuse->rejection_reason}}</p>
+
+
                                         @endif
+                                        </div>
                                         </td>
                                         
                                         {{-- <td>@lang('messages.' . $deprivation->status)</td>  --}}
                                         @else
-                                        <td>
-                                            <i class="fa fa-file-upload  custom-icon custom-color-icon" onclick="enterFile({{ $deprivation->id }})" title="{{ __('messages.enter_excuse') }}"></i>
 
-                                        </td>  
+                                        <td>
+                                            <i class="fa fa-file-upload  custom-icon custom-color-icon" onclick="enterFile({{ $deprivation->id }}, 'excuses')" title="{{ __('messages.enter_excuse') }}"></i>
+
+                                        </td>
+                          
+
+                                        <td>
+                                            <i class="fa fa-file-upload  custom-icon custom-color-icon" onclick="enterFile({{ $deprivation->id }}, 'academic file')" title="{{ __('messages.academic_file') }}"></i>
+
+                                        </td>
+
+
+                                        <td>
+                                            <i class="fa fa-file-upload  custom-icon custom-color-icon" onclick="enterFile({{ $deprivation->id }}, 'absence')" title="{{ __('messages.absence') }}"></i>
+
+                                        </td> 
                                         <td>
                                             @lang('messages.no_excuse')
                                         </td>               
@@ -104,7 +156,7 @@
     
 
 <script>
-    function enterFile(Id) {
+    function enterFile(Id, folder_name) {
       const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   
       Swal.fire({
@@ -131,6 +183,8 @@
           var formData = new FormData();
           formData.append('id', Id);
           formData.append('file', document.getElementById('excuseFile').files[0]);
+          formData.append('folder_name', folder_name);
+
           formData.append('_token', token);
   
           axios.post('/Excuse/submit-excuse', formData, {

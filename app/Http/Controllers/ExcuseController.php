@@ -98,9 +98,14 @@ class ExcuseController extends Controller
             'id' => 'required|integer|exists:deprivations,id',
             'file' => 'required',
         ]);
+
         
+        $folder_name = $request->folder_name;
+        $excuse = Excuse::where('deprivation_id', $validatedData['id'])->first();
+        if(!$excuse){
 
         $excuse = new Excuse();
+        }
 
         $user = auth()->user(); // Get the authenticated user
 
@@ -125,17 +130,23 @@ class ExcuseController extends Controller
         $filename = $safeName . '.' . $extension;
 
         // Check if file exists and append counter number to filename
-        while (Storage::disk('private')->exists('excuses/' . $filename)) {
+        while (Storage::disk('private')->exists($folder_name.'/' . $filename)) {
             $filename = $safeName . '-' . $counter . '.' . $extension;
             $counter++;
         }
 
         // Store the file using the 'private' disk
-        $filePath = $validatedData['file']->storeAs('excuses', $filename, 'private');
+        $filePath = $validatedData['file']->storeAs($folder_name, $filename, 'private');
 
         // Set the file_path on the model
-        $excuse->excuse_file_path = $filePath;
-        
+        if ($folder_name == "excuses" )
+            $excuse->excuse_file_path = $filePath;
+        if($folder_name == "academic file")
+        {
+            $excuse->academic_file = $filePath;
+        }
+        if ($folder_name == "absence")
+            $excuse->absence = $filePath;
 
         $excuse->save();
 
@@ -151,12 +162,17 @@ class ExcuseController extends Controller
             'file' => Rule::requiredIf(function () use ($request) {
                 return $request->status == false;
             }),
+            'rejection_reason' => Rule::requiredIf(function () use ($request) {
+                return $request->status == false;
+            }),
         ]);
         $excuse = Excuse::find($validatedData['id']);
         if ($validatedData['status'])
             $excuse->advisor_decision =  "Approved";
-        if ( $excuse->rejection_reason_file_path)
+        if ( $excuse->rejection_reason_file_path){
             $excuse->rejection_reason_file_path = null;
+            $excuse->rejection_reason = null;
+        }
 
 
 
@@ -186,6 +202,7 @@ class ExcuseController extends Controller
 
             // Set the file_path on the model
             $excuse->rejection_reason_file_path = $filePath; 
+            $excuse->rejection_reason = $validatedData['rejection_reason'];
             $excuse->final_decision = "Rejected";
             $excuse->advisor_decision =  "Rejected";  
 

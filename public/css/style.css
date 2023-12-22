@@ -178,3 +178,11 @@ main {
 #exportButton:hover {
     background-color: #3b5283; /* Darker shade for hover effect */
 }
+
+.scrollable-td {
+    max-height: 50px;
+    width: 100px;
+
+    overflow-y: auto;
+    /* Add more styling here if needed */
+}

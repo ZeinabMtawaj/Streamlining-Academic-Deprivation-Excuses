@@ -44,6 +44,37 @@ class ExcuseController extends AdminController
                 return "<a href='#' onclick='event.preventDefault(); window.location.href=\"{$url}\";'>{$name_of_file}</a>";            }
             return 'No file';
         });
+        $grid->column('academic_file', __('admin.academic_file'))->display(function ($file_path) {
+            $currentId = $this->getAttribute('id');
+
+            if ($file_path) {
+                $name_of_file = basename($file_path);
+
+                $url = route('file.download', [
+                    'model' => 'excuse', 
+                    'folder' => 'academic file', 
+                    'id' => $currentId, 
+                ]);
+                return "<a href='#' onclick='event.preventDefault(); window.location.href=\"{$url}\";'>{$name_of_file}</a>";            }
+            return 'No file';
+        });
+        $grid->column('absence', __('admin.absence'))->display(function ($file_path) {
+            $currentId = $this->getAttribute('id');
+
+            if ($file_path) {
+                $name_of_file = basename($file_path);
+
+                $url = route('file.download', [
+                    'model' => 'excuse', 
+                    'folder' => 'absence', 
+                    'id' => $currentId, 
+                ]);
+                return "<a href='#' onclick='event.preventDefault(); window.location.href=\"{$url}\";'>{$name_of_file}</a>";            }
+            return 'No file';
+        });
+
+
+
 
 
         $grid->column('deprivation.student.user_name', __('admin.deprived_student'))
@@ -71,6 +102,10 @@ class ExcuseController extends AdminController
                 return "<a href='#' onclick='event.preventDefault(); window.location.href=\"{$url}\";'>{$name_of_file}</a>";            }
             return 'No file';
         });
+
+        $grid->column('rejection_reason', __('admin.rejection_reason'));
+
+ 
         $grid->column('created_at', __('admin.created_at'));
         $grid->column('updated_at', __('admin.updated_at'));
 
@@ -89,6 +124,8 @@ class ExcuseController extends AdminController
 
         $show->field('id', __('Id'));
         $show->field('excuse_file_path', __('admin.excuse_file'));
+        $show->field('academic_file', __('admin.academic_file'));
+        $show->field('absence', __('admin.absence'));
         $show->field('deprivation.student.username', __('admin.deprived_student'))
         ->as(function () {
             return $this->deprivation->student->username ?? 'N/A';
@@ -102,6 +139,10 @@ class ExcuseController extends AdminController
         $show->field('committee_decision', __('admin.committee_decision'));
         $show->field('final_decision', __('admin.final_decision'));
         $show->field('rejection_reason_file_path', __('admin.rejection_reason_file'));
+        $show->field('rejection_reason', __('admin.rejection_reason'));
+
+ 
+
         $show->field('created_at', __('admin.created_at'));
         $show->field('updated_at', __('admin.updated_at'));
 
@@ -121,6 +162,15 @@ class ExcuseController extends AdminController
             ->move('excuses/', date('YmdHis') . '-' . Str::random(7))
             ->disk('private');
 
+        $form->file('academic_file', __('admin.academic_file'))
+            ->rules('required')
+            ->move('academic file/', date('YmdHis') . '-' . Str::random(7))
+            ->disk('private');
+        $form->file('absence', __('admin.absence'))
+            ->rules('required')
+            ->move('absence/', date('YmdHis') . '-' . Str::random(7))
+            ->disk('private');
+
         $form->select('deprivation_id', __('admin.deprivation'))
             ->options(\App\Models\Deprivation::all()->mapWithKeys(function ($item) {
                 return [$item->id => __('admin.deprived_student') . ' - ' . $item->student->username . ', ' . __('admin.course_deprived_from') . ' - ' . $item->course->course_name];
@@ -131,9 +181,11 @@ class ExcuseController extends AdminController
         // $form->text('committee_decision', __('admin.committee_decision'));
         // $form->text('final_decision', __('admin.final_decision'));
 
-        $form->file('rejection_reason_file_path', __('admin.rejection_reason_file'))
-            ->move('rejection reason files/', date('YmdHis') . '-' . Str::random(7))
-            ->disk('private');
+        // $form->file('rejection_reason_file_path', __('admin.rejection_reason_file'))
+        //     ->move('rejection reason files/', date('YmdHis') . '-' . Str::random(7))
+        //     ->disk('private');
+
+        // $form->text('rejection_reason', __('admin.rejection_reason'));
 
         return $form;
     }

@@ -84,12 +84,20 @@ class CommitteeController extends Controller
             'current_absence_percentage' => Rule::requiredIf(function () use ($request) {
                 return $request->status == "true";
             }),
+            'rejection_reason' => Rule::requiredIf(function () use ($request) {
+                return $request->status == "false";
+            }),
         ]);
         $excuse = Excuse::find($validatedData['id']);
         if ($validatedData['status'] == "true")
             $excuse->committee_decision =  "Approved";
         else
             $excuse->committee_decision =  "Rejected";
+
+        if ( $excuse->rejection_reason_file_path){
+                $excuse->rejection_reason_file_path = null;
+                $excuse->rejection_reason = null;
+            }
 
 
 
@@ -120,6 +128,7 @@ class CommitteeController extends Controller
 
             // Set the file_path on the model
             $excuse->rejection_reason_file_path = $filePath; 
+            $excuse->rejection_reason = $validatedData['rejection_reason'];
             $excuse->committee_decision =  "Rejected";  
 
             $excuse->final_decision = "Rejected";

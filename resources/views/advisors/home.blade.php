@@ -34,6 +34,9 @@
                                     <th scope="col">@lang('messages.course')</th> 
                                     <th scope="col">@lang('messages.initial_absence_percentage')</th>
                                     <th scope="col">@lang('messages.excuse')</th> 
+                                    <th scope="col">@lang('messages.academic-file')</th> 
+                                    <th scope="col">@lang('messages.absence')</th> 
+
                                     <th scope="col">@lang('messages.action')</th> 
                                     <th scope="col">@lang('messages.status')</th> 
 
@@ -64,10 +67,22 @@
                                             <a href="{{ $url }}">{{ $name_of_file }}</a>
                                         </td>
                                         <td>
+                                            @php $name_of_file = basename($excuse->academic_file); @endphp
+                                            @php $url = route('file.download', ['model' => 'excuse', 'folder' => 'academic file', 'id' => $excuse->id, 'file' => $name_of_file]); @endphp
+                                            <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                        </td>
+                                        <td>
+                                            @php $name_of_file = basename($excuse->absence); @endphp
+                                            @php $url = route('file.download', ['model' => 'excuse', 'folder' => 'absence', 'id' => $excuse->id, 'file' => $name_of_file]); @endphp
+                                            <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                        </td>
+                                        <td>
                                             <i class="fa fa-check custom-icon text-success" onclick="updateStatus({{ $excuse->id }}, true)" title="{{ __('messages.approve_it') }}"></i> &nbsp;&nbsp;
                                             <i class="fa fa-times custom-icon text-danger" onclick="updateStatus({{ $excuse->id }}, false)" title="{{ __('messages.reject_it') }}"></i>
                                         </td>
-                                        <td>
+                                        <td >
+                                            <div class="scrollable-td">
+
                                             @php
                                                 $badgeClass = match($excuse->advisor_decision) {
                                                     'Pending' => 'badge-pending',
@@ -87,7 +102,12 @@
                                                 @endphp
                                                 <br>
                                                 <a href="{{ $url }}">{{ $name_of_file }}</a>
+                                                <br>
+
+                                                <p> {{$excuse->rejection_reason}}</p>
+                                                
                                             @endif
+                                            </div>
                                         </td>
                                         
                                         {{-- <td>@lang('messages.' . $deprivation->status)</td>  --}}
@@ -133,6 +153,8 @@
                 <label for="rejectionFile" class="custom-file-upload swal2-styled">
                     Choose File
                 </label>
+                <textarea id="explain" name="rejection_reason" rows="4" cols="50" placeholder="Explain ...."></textarea>
+
             `;
             confirmButtonText = @json(__('messages.submit_rejection'));
         }
@@ -162,6 +184,7 @@
 
                 if (!status) {
                     formData.append('file', document.getElementById('rejectionFile').files[0]);
+                    formData.append('rejection_reason', document.getElementById('explain').value);
 
                 }
 
